@@ -5,7 +5,7 @@ export default async function HomePage(): Promise<JSX.Element> {
   let healthOk = false;
 
   try {
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001/api';
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? 'https://mynf-production.up.railway.app/api';
     const response = await fetch(`${apiUrl}/health`, { cache: 'no-store' });
     const json = (await response.json()) as { status?: string };
     health = json.status ?? 'desconhecido';
