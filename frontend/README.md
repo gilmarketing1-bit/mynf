@@ -1,0 +1,14 @@
+# Frontend (Next.js)
+
+## Páginas iniciais
+- `/`: status da API
+- `/login`: tela inicial de autenticação
+- `/dashboard`: dashboard inicial
+
+## Comandos
+```bash
+npm install
+npm run dev
+```
+
+Configurar `NEXT_PUBLIC_API_URL` para apontar ao backend.

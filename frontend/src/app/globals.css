@@ -1,0 +1,25 @@
+:root {
+  color-scheme: light;
+  font-family: Inter, Arial, sans-serif;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background: #f7fafc;
+  color: #0f172a;
+}
+
+main {
+  max-width: 900px;
+  margin: 40px auto;
+  padding: 24px;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.08);
+}
+
+a {
+  color: #0ea5e9;
+  text-decoration: none;
+}

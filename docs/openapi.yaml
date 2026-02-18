@@ -1,0 +1,87 @@
+openapi: 3.0.3
+info:
+  title: Plataforma NFS-e API
+  version: 0.2.0
+  description: API inicial da plataforma SaaS NFS-e multi-tenant.
+servers:
+  - url: http://localhost/api
+paths:
+  /health:
+    get:
+      summary: Health check
+      responses:
+        '200':
+          description: OK
+  /auth/login:
+    post:
+      summary: Login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Tokens de autenticação
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+  /companies:
+    get:
+      summary: Listar empresas do tenant
+      parameters:
+        - in: header
+          name: x-tenant-id
+          schema:
+            type: string
+          required: false
+      security: [{ bearerAuth: [] }]
+      responses:
+        '200':
+          description: Lista de empresas
+    post:
+      summary: Criar empresa
+      parameters:
+        - in: header
+          name: x-tenant-id
+          schema:
+            type: string
+          required: false
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCompanyRequest'
+      responses:
+        '201':
+          description: Empresa criada
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    LoginRequest:
+      type: object
+      required: [email, password]
+      properties:
+        email: { type: string, format: email }
+        password: { type: string, minLength: 8 }
+    LoginResponse:
+      type: object
+      required: [accessToken, refreshToken, expiresIn]
+      properties:
+        accessToken: { type: string }
+        refreshToken: { type: string }
+        expiresIn: { type: integer, example: 900 }
+    CreateCompanyRequest:
+      type: object
+      required: [cnpj, razaoSocial]
+      properties:
+        cnpj: { type: string, example: '12345678000190' }
+        razaoSocial: { type: string, example: 'Empresa Exemplo Ltda' }
