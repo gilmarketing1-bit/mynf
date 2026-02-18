@@ -1,13 +1,5 @@
 # Backend (NestJS)
 
-<<<<<<< ours
-Escopo planejado:
-- Auth + JWT + 2FA
-- Multi-tenancy + RLS
-- Emissão NFS-e (Goiânia adapter)
-- Billing adapter
-- IA contextual
-=======
 ## Módulos iniciais
 - `health`: endpoint de saúde
 - `auth`: login com emissão de access/refresh token (base)
@@ -23,4 +15,3 @@ npm run start:dev
 ## Banco
 - Migration inicial: `db/migrations/0001_init.sql`
 - Inclui tabelas mínimas (`tenants`, `accounts`, `users`) e RLS base.
->>>>>>> theirs

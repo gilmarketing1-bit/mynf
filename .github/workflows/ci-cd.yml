@@ -7,20 +7,36 @@ on:
     branches: [main]
 
 jobs:
-  quality:
+  backend:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
     steps:
       - uses: actions/checkout@v4
-      - name: Lint placeholder
-        run: echo "Lint será habilitado quando backend/frontend estiverem scaffolded"
-      - name: Typecheck placeholder
-        run: echo "Typecheck será habilitado na Fase 1/2"
-      - name: Build docs sanity
-        run: test -f docs/SAD.md && test -f docs/DER.md && test -f docs/openapi.yaml
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm install
+      - run: npm run typecheck
+      - run: npm run build
 
-  build:
+  frontend:
     runs-on: ubuntu-latest
-    needs: [quality]
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm install
+      - run: npm run typecheck
+      - run: npm run build
+
+  infra:
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - name: Validate docker compose file

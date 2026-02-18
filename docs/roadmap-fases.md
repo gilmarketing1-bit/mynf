@@ -1,15 +1,5 @@
 # Roadmap de Implementação — Prompt Mestre v2.0
 
-<<<<<<< ours
-## Fase 0 — Infraestrutura
-- Monorepo estruturado.
-- Docker Compose com PostgreSQL, Redis, MinIO, backend e frontend.
-- Base de migrations e RLS.
-- Pipeline CI básico.
-
-## Fase 1 — Backend Core
-- Auth (JWT, refresh, 2FA, lock por tentativas).
-=======
 ## Fase 0 — Infraestrutura (concluída parcialmente)
 - [x] Monorepo estruturado.
 - [x] Docker Compose com PostgreSQL, Redis, MinIO, backend, frontend e Nginx.
@@ -20,7 +10,6 @@
 
 ## Fase 1 — Backend Core
 - Auth completo (JWT, refresh, 2FA, lock por tentativas).
->>>>>>> theirs
 - Multi-tenancy com TenantInterceptor + RLS.
 - RBAC por perfil.
 - CRUDs principais.

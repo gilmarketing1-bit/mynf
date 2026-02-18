@@ -1,17 +1,10 @@
 openapi: 3.0.3
 info:
   title: Plataforma NFS-e API
-<<<<<<< ours
-  version: 0.1.0
-  description: API inicial da plataforma SaaS NFS-e multi-tenant.
-servers:
-  - url: https://api.exemplo.com
-=======
   version: 0.2.0
   description: API inicial da plataforma SaaS NFS-e multi-tenant.
 servers:
   - url: http://localhost/api
->>>>>>> theirs
 paths:
   /health:
     get:
@@ -38,62 +31,18 @@ paths:
   /companies:
     get:
       summary: Listar empresas do tenant
-<<<<<<< ours
-=======
       parameters:
         - in: header
           name: x-tenant-id
           schema:
             type: string
           required: false
->>>>>>> theirs
       security: [{ bearerAuth: [] }]
       responses:
         '200':
           description: Lista de empresas
     post:
       summary: Criar empresa
-<<<<<<< ours
-      security: [{ bearerAuth: [] }]
-      responses:
-        '201':
-          description: Empresa criada
-  /nfse:
-    post:
-      summary: Criar rascunho de NFS-e
-      security: [{ bearerAuth: [] }]
-      responses:
-        '201':
-          description: Rascunho criado
-  /nfse/{id}/emitir:
-    post:
-      summary: Emitir NFS-e
-      security: [{ bearerAuth: [] }]
-      parameters:
-        - in: path
-          name: id
-          required: true
-          schema: { type: string, format: uuid }
-      responses:
-        '200':
-          description: Emissão concluída
-        '422':
-          description: Rejeição fiscal
-  /billing/invoices:
-    get:
-      summary: Listar faturas
-      security: [{ bearerAuth: [] }]
-      responses:
-        '200':
-          description: Lista de faturas
-  /ai/chat:
-    post:
-      summary: Conversa com assistente IA
-      security: [{ bearerAuth: [] }]
-      responses:
-        '200':
-          description: Resposta do assistente
-=======
       parameters:
         - in: header
           name: x-tenant-id
@@ -110,7 +59,6 @@ paths:
       responses:
         '201':
           description: Empresa criada
->>>>>>> theirs
 components:
   securitySchemes:
     bearerAuth:
@@ -131,12 +79,9 @@ components:
         accessToken: { type: string }
         refreshToken: { type: string }
         expiresIn: { type: integer, example: 900 }
-<<<<<<< ours
-=======
     CreateCompanyRequest:
       type: object
       required: [cnpj, razaoSocial]
       properties:
         cnpj: { type: string, example: '12345678000190' }
         razaoSocial: { type: string, example: 'Empresa Exemplo Ltda' }
->>>>>>> theirs
