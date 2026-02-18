@@ -69,6 +69,7 @@ Fluxo resumido:
 - Escalabilidade: API stateless horizontal + workers separados.
 - Disponibilidade: filas para desacoplar integrações externas instáveis.
 
+<<<<<<< ours
 ## 6. Estratégia de infraestrutura (AWS recomendada)
 - ECS Fargate (backend/frontend/workers)
 - RDS PostgreSQL 16
@@ -84,6 +85,20 @@ Sizing inicial (MVP):
 - Frontend: 2 tarefas (0.25 vCPU / 0.5GB)
 - Redis t4g.small
 - RDS db.t4g.medium
+=======
+## 6. Estratégia de infraestrutura (Oracle Cloud Free Tier)
+- OCI Compute VM Always Free (Ubuntu) com Docker Compose
+- PostgreSQL 16 em container (inicial) com volume persistente
+- Redis 7 em container
+- MinIO para objetos em ambiente inicial
+- Nginx para reverse proxy e terminação TLS
+- OCI DNS (ou provedor externo) para domínio
+
+Sizing inicial (MVP):
+- 1 VM Always Free com backend, frontend, postgres, redis, minio e nginx
+- Escala vertical inicial + otimização de processos
+- Evolução futura: separar banco e mover para serviço gerenciado conforme crescimento
+>>>>>>> theirs
 
 ## 7. Riscos técnicos e mitigação
 1. Instabilidade WS prefeitura: timeout, retry exponencial, circuit breaker, fila.
