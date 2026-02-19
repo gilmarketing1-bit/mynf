@@ -10,12 +10,15 @@ export default function NovaNotaPage() {
   const [buscando, setBuscando] = useState(false);
   const [tomadorEncontrado, setTomadorEncontrado] = useState(false);
   const [form, setForm] = useState({
-    cnpj: '', razaoSocial: '', email: '', endereco: '',
+    cnpj: '', razaoSocial: '', email: '',
+    logradouro: '', numero: '', complemento: '',
+    bairro: '', cep: '', municipio: '', uf: '',
+    situacao: '', ativa: true,
     descricao: '', codigoServico: '',
     valor: '', aliquotaIss: '2',
   });
 
-  const update = (field: string, value: string) =>
+  const update = (field: string, value: string | boolean) =>
     setForm(prev => ({ ...prev, [field]: value }));
 
   const formatCnpj = (v: string) => {
@@ -34,13 +37,22 @@ export default function NovaNotaPage() {
     setTomadorEncontrado(false);
     try {
       const res = await fetch(`https://brasilapi.com.br/api/cnpj/v1/${cnpjLimpo}`);
-      if (!res.ok) throw new Error('CNPJ não encontrado');
+      if (!res.ok) throw new Error('não encontrado');
       const data = await res.json();
+      const situacao = (data.descricao_situacao_cadastral || '').toUpperCase();
+      const ativa = situacao === 'ATIVA';
       setForm(prev => ({
         ...prev,
         razaoSocial: data.razao_social || '',
-        email: prev.email,
-        endereco: `${data.logradouro || ''}, ${data.numero || ''} — ${data.municipio || ''}/${data.uf || ''}`,
+        logradouro: [data.descricao_tipo_logradouro, data.logradouro].filter(Boolean).join(' '),
+        numero: data.numero || '',
+        complemento: data.complemento || '',
+        bairro: data.bairro || '',
+        cep: (data.cep || '').replace(/^(\d{5})(\d{3})$/, '$1-$2'),
+        municipio: data.municipio || '',
+        uf: data.uf || '',
+        situacao,
+        ativa,
       }));
       setTomadorEncontrado(true);
     } catch {
@@ -49,6 +61,9 @@ export default function NovaNotaPage() {
       setBuscando(false);
     }
   };
+
+  const iss = Number(form.valor) * Number(form.aliquotaIss) / 100;
+  const liquido = Number(form.valor) - iss;
 
   return (
     <div className="min-h-screen bg-slate-50 pb-24">
@@ -82,7 +97,6 @@ export default function NovaNotaPage() {
           <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 space-y-4">
             <h2 className="font-semibold text-slate-900">Dados do Tomador</h2>
 
-            {/* CNPJ + Buscar */}
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-1">CNPJ / CPF</label>
               <div className="flex gap-2">
@@ -103,14 +117,19 @@ export default function NovaNotaPage() {
               </div>
             </div>
 
-            {/* Badge de sucesso */}
-            {tomadorEncontrado && (
-              <div className="flex items-center gap-2 bg-green-50 border border-green-200 rounded-xl px-4 py-2">
-                <span className="text-green-600 text-sm">✅ Dados encontrados na Receita Federal</span>
+            {/* Status da empresa */}
+            {tomadorEncontrado && form.ativa && (
+              <div className="bg-green-50 border border-green-200 rounded-xl px-4 py-2">
+                <span className="text-green-700 text-sm font-medium">✅ Dados encontrados — Empresa ATIVA</span>
+              </div>
+            )}
+            {tomadorEncontrado && !form.ativa && (
+              <div className="bg-red-50 border border-red-300 rounded-xl px-4 py-3">
+                <p className="text-red-700 text-sm font-semibold">⛔ Empresa impedida de emitir NFS-e</p>
+                <p className="text-red-600 text-xs mt-1">Situação cadastral: {form.situacao}</p>
               </div>
             )}
 
-            {/* Razão Social */}
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-1">Razão Social / Nome</label>
               <input
@@ -122,20 +141,61 @@ export default function NovaNotaPage() {
               />
             </div>
 
-            {/* Endereço (readonly se veio da API) */}
-            {form.endereco && (
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">Endereço</label>
-                <input
-                  type="text"
-                  value={form.endereco}
-                  onChange={e => update('endereco', e.target.value)}
-                  className="w-full px-4 py-3 border border-slate-200 rounded-xl text-sm bg-slate-50 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                />
+            {/* Endereço completo */}
+            {form.logradouro && (
+              <div className="space-y-3">
+                <div className="grid grid-cols-3 gap-3">
+                  <div className="col-span-2">
+                    <label className="block text-sm font-medium text-slate-700 mb-1">Logradouro</label>
+                    <input type="text" value={form.logradouro}
+                      onChange={e => update('logradouro', e.target.value)}
+                      className="w-full px-4 py-3 border border-slate-200 rounded-xl text-sm bg-slate-50 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-1">Número</label>
+                    <input type="text" value={form.numero}
+                      onChange={e => update('numero', e.target.value)}
+                      className="w-full px-4 py-3 border border-slate-200 rounded-xl text-sm bg-slate-50 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">Complemento</label>
+                  <input type="text" value={form.complemento}
+                    onChange={e => update('complemento', e.target.value)}
+                    placeholder="Apto, Sala, Bloco..."
+                    className="w-full px-4 py-3 border border-slate-200 rounded-xl text-sm bg-slate-50 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-1">Bairro</label>
+                    <input type="text" value={form.bairro}
+                      onChange={e => update('bairro', e.target.value)}
+                      className="w-full px-4 py-3 border border-slate-200 rounded-xl text-sm bg-slate-50 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-1">CEP</label>
+                    <input type="text" value={form.cep}
+                      onChange={e => update('cep', e.target.value)}
+                      className="w-full px-4 py-3 border border-slate-200 rounded-xl text-sm bg-slate-50 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+                  </div>
+                </div>
+                <div className="grid grid-cols-3 gap-3">
+                  <div className="col-span-2">
+                    <label className="block text-sm font-medium text-slate-700 mb-1">Município</label>
+                    <input type="text" value={form.municipio}
+                      onChange={e => update('municipio', e.target.value)}
+                      className="w-full px-4 py-3 border border-slate-200 rounded-xl text-sm bg-slate-50 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-1">UF</label>
+                    <input type="text" value={form.uf}
+                      onChange={e => update('uf', e.target.value)}
+                      className="w-full px-4 py-3 border border-slate-200 rounded-xl text-sm bg-slate-50 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+                  </div>
+                </div>
               </div>
             )}
 
-            {/* Email */}
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-1">E-mail para envio da nota</label>
               <input
@@ -208,11 +268,11 @@ export default function NovaNotaPage() {
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-slate-500">ISS ({form.aliquotaIss}%)</span>
-                  <span className="font-medium text-orange-600">R$ {(Number(form.valor) * Number(form.aliquotaIss) / 100).toFixed(2)}</span>
+                  <span className="font-medium text-orange-600">R$ {iss.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between text-sm border-t border-slate-200 pt-2">
                   <span className="font-semibold text-slate-900">Valor líquido</span>
-                  <span className="font-bold text-green-600">R$ {(Number(form.valor) - Number(form.valor) * Number(form.aliquotaIss) / 100).toFixed(2)}</span>
+                  <span className="font-bold text-green-600">R$ {liquido.toFixed(2)}</span>
                 </div>
               </div>
             )}
@@ -227,16 +287,17 @@ export default function NovaNotaPage() {
               {[
                 { label: 'Tomador', value: form.razaoSocial || '—' },
                 { label: 'CNPJ/CPF', value: form.cnpj || '—' },
-                { label: 'Endereço', value: form.endereco || '—' },
+                { label: 'Endereço', value: form.logradouro ? `${form.logradouro}, ${form.numero} — ${form.bairro}, ${form.municipio}/${form.uf} — CEP ${form.cep}` : '—' },
                 { label: 'E-mail', value: form.email || '—' },
                 { label: 'Serviço', value: form.codigoServico || '—' },
                 { label: 'Descrição', value: form.descricao || '—' },
                 { label: 'Valor', value: form.valor ? `R$ ${Number(form.valor).toFixed(2)}` : '—' },
-                { label: 'ISS', value: `${form.aliquotaIss}%` },
+                { label: 'ISS', value: `${form.aliquotaIss}% — R$ ${iss.toFixed(2)}` },
+                { label: 'Valor líquido', value: form.valor ? `R$ ${liquido.toFixed(2)}` : '—' },
               ].map(item => (
                 <div key={item.label} className="flex justify-between py-2 border-b border-slate-100 last:border-0">
                   <span className="text-sm text-slate-500">{item.label}</span>
-                  <span className="text-sm font-medium text-slate-900 text-right max-w-xs truncate">{item.value}</span>
+                  <span className="text-sm font-medium text-slate-900 text-right max-w-xs">{item.value}</span>
                 </div>
               ))}
             </div>
@@ -257,7 +318,11 @@ export default function NovaNotaPage() {
             </button>
           )}
           {step < steps.length - 1 && (
-            <button onClick={() => setStep(s => s + 1)} className="flex-1 bg-indigo-500 hover:bg-indigo-600 text-white font-semibold py-3 rounded-xl text-sm transition-colors">
+            <button
+              onClick={() => setStep(s => s + 1)}
+              disabled={step === 0 && tomadorEncontrado && !form.ativa}
+              className="flex-1 bg-indigo-500 hover:bg-indigo-600 disabled:opacity-40 disabled:cursor-not-allowed text-white font-semibold py-3 rounded-xl text-sm transition-colors"
+            >
               Próximo →
             </button>
           )}
