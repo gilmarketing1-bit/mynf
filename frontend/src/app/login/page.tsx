@@ -1,8 +1,12 @@
 'use client';
 
 import { signIn } from 'next-auth/react';
+import { useState } from 'react';
 
 export default function LoginPage() {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+
   return (
     <section className="bg-slate-50 min-h-screen">
       <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto min-h-screen">
@@ -16,9 +20,10 @@ export default function LoginPage() {
 
         <div className="w-full bg-white rounded-2xl shadow-lg p-8 max-w-md">
           <h1 className="text-2xl font-bold text-slate-900 mb-1">Entrar na sua conta</h1>
-          <p className="text-slate-500 text-sm mb-8">Emita NFS-e em menos de 60 segundos</p>
+          <p className="text-slate-500 text-sm mb-6">Emita NFS-e em menos de 60 segundos</p>
 
-          <div className="space-y-3">
+          {/* Login social */}
+          <div className="space-y-3 mb-6">
             <button
               onClick={() => signIn('google')}
               className="w-full flex items-center justify-center gap-3 border border-slate-200 hover:bg-slate-50 text-slate-700 font-semibold py-3 rounded-xl transition-colors text-sm"
@@ -31,9 +36,68 @@ export default function LoginPage() {
               </svg>
               Entrar com Google
             </button>
-          </div>
-        </div>
 
+            <button
+              onClick={() => signIn('azure-ad')}
+              className="w-full flex items-center justify-center gap-3 border border-slate-200 hover:bg-slate-50 text-slate-700 font-semibold py-3 rounded-xl transition-colors text-sm"
+            >
+              <svg className="w-5 h-5" viewBox="0 0 24 24">
+                <path fill="#f25022" d="M1 1h10v10H1z"/>
+                <path fill="#00a4ef" d="M13 1h10v10H13z"/>
+                <path fill="#7fba00" d="M1 13h10v10H1z"/>
+                <path fill="#ffb900" d="M13 13h10v10H13z"/>
+              </svg>
+              Entrar com Microsoft
+            </button>
+          </div>
+
+          {/* Divisor */}
+          <div className="flex items-center gap-3 mb-6">
+            <div className="flex-1 h-px bg-slate-200" />
+            <span className="text-slate-400 text-xs">ou continue com e-mail</span>
+            <div className="flex-1 h-px bg-slate-200" />
+          </div>
+
+          {/* Formulário email/senha */}
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1">E-mail</label>
+              <input
+                type="email"
+                value={email}
+                onChange={e => setEmail(e.target.value)}
+                placeholder="voce@empresa.com.br"
+                className="w-full px-4 py-3 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+              />
+            </div>
+            <div>
+              <div className="flex justify-between mb-1">
+                <label className="text-sm font-medium text-slate-700">Senha</label>
+                <button className="text-sm text-primary-600 hover:underline">Esqueci minha senha</button>
+              </div>
+              <input
+                type="password"
+                value={password}
+                onChange={e => setPassword(e.target.value)}
+                placeholder="••••••••"
+                className="w-full px-4 py-3 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+              />
+            </div>
+            <button
+              onClick={() => signIn('credentials', { email, password })}
+              className="w-full bg-primary-500 hover:bg-primary-600 text-white font-semibold py-3 rounded-xl transition-colors text-sm"
+            >
+              Entrar
+            </button>
+          </div>
+
+          <p className="text-sm text-slate-500 text-center mt-6">
+            Não tem conta?{' '}
+            <a href="/registro" className="text-primary-600 font-medium hover:underline">
+              Criar conta grátis
+            </a>
+          </p>
+        </div>
       </div>
     </section>
   );
