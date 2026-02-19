@@ -254,3 +254,16 @@ export default function NovaNotaPage() {
           {step > 0 && (
             <button onClick={() => setStep(s => s - 1)} className="flex-1 border border-slate-200 text-slate-700 font-semibold py-3 rounded-xl text-sm hover:bg-slate-50 transition-colors">
               ← Anterior
+            </button>
+          )}
+          {step < steps.length - 1 && (
+            <button onClick={() => setStep(s => s + 1)} className="flex-1 bg-indigo-500 hover:bg-indigo-600 text-white font-semibold py-3 rounded-xl text-sm transition-colors">
+              Próximo →
+            </button>
+          )}
+        </div>
+
+      </div>
+    </div>
+  );
+}
