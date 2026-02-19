@@ -1,18 +1,21 @@
+'use client';
+
 import Link from 'next/link';
+import { useEffect, useState } from 'react';
 
-export default async function HomePage(): Promise<JSX.Element> {
-  let health = 'desconhecido';
-  let healthOk = false;
+export default function HomePage() {
+  const [health, setHealth] = useState('verificando...');
+  const [healthOk, setHealthOk] = useState(false);
 
-  try {
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? 'https://mynf-production.up.railway.app/api';
-    const response = await fetch(`${apiUrl}/health`, { cache: 'no-store' });
-    const json = (await response.json()) as { status?: string };
-    health = json.status ?? 'desconhecido';
-    healthOk = health === 'ok';
-  } catch {
-    health = 'offline';
-  }
+  useEffect(() => {
+    fetch('https://mynf-production.up.railway.app/api/health', { cache: 'no-store' })
+      .then(r => r.json())
+      .then((json: { status?: string }) => {
+        setHealth(json.status ?? 'desconhecido');
+        setHealthOk(json.status === 'ok');
+      })
+      .catch(() => setHealth('offline'));
+  }, []);
 
   return (
     <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
