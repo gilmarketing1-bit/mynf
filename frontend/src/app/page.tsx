@@ -31,14 +31,9 @@ export default function HomePage() {
           <span className={`w-2 h-2 rounded-full ${healthOk ? 'bg-success-500' : 'bg-danger-500'}`} />
           API {health}
         </div>
-        <div className="flex flex-col gap-3">
-          <Link href="/login" className="w-full bg-primary-500 hover:bg-primary-600 text-white font-semibold py-3 rounded-xl transition-colors">
-            Entrar
-          </Link>
-          <Link href="/dashboard" className="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold py-3 rounded-xl transition-colors">
-            Dashboard
-          </Link>
-        </div>
+        <Link href="/login" className="w-full block bg-primary-500 hover:bg-primary-600 text-white font-semibold py-3 rounded-xl transition-colors">
+          Entrar
+        </Link>
       </div>
     </div>
   );
