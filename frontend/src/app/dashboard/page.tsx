@@ -30,7 +30,7 @@ export default function DashboardPage() {
             { label: 'Notas Emitidas', href: '/notas', active: false },
             { label: 'Clientes', href: '/clientes', active: false },
             { label: 'Relatórios', href: '/relatorios', active: false },
-            { label: 'Configurações', href: '/configuracoes', active: false },
+            { label: 'Configurações', href: '/empresas/configuracao', active: false },
           ].map((item) => (
             <Link
               key={item.href}
@@ -115,7 +115,7 @@ export default function DashboardPage() {
             { label: 'Início', href: '/dashboard' },
             { label: 'Nova Nota', href: '/notas/nova' },
             { label: 'Notas', href: '/notas' },
-            { label: 'Config', href: '/configuracoes' },
+            { label: 'Config', href: '/empresas/configuracao' },
           ].map((item) => (
             <Link key={item.href} href={item.href} className="flex flex-col items-center text-xs text-slate-500 hover:text-primary-600 py-1 px-3">
               {item.label}
