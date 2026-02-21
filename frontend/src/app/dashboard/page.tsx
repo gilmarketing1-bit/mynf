@@ -307,8 +307,3 @@ export default function DashboardPage() {
     </div>
   );
 }
-```
-
-Agora crie o arquivo `frontend/.env.local` se não existir com:
-```
-NEXT_PUBLIC_API_URL=https://mynf-production.up.railway.app/api
