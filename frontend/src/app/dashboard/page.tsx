@@ -2,13 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-
-const API = process.env.NEXT_PUBLIC_API_URL || 'https://mynf-production.up.railway.app/api';
-
-function getToken() {
-  if (typeof window === 'undefined') return null;
-  return localStorage.getItem('mynf_token');
-}
+import { apiFetch } from '@/lib/api';
 
 function formatBRL(v: number) {
   return (v || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
@@ -35,24 +29,20 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const token = getToken();
-    const headers: any = { 'Content-Type': 'application/json' };
-    if (token) headers['Authorization'] = `Bearer ${token}`;
-
-    Promise.all([
-      fetch(`${API}/nfse/dashboard`, { headers }).then(r => r.json()),
-      fetch(`${API}/nfse?limit=5`, { headers }).then(r => r.json()),
-      fetch(`${API}/clients`, { headers }).then(r => r.json()),
-    ]).then(([dashboard, notasData, clientesData]) => {
-      setDados(dashboard);
-      setNotas(Array.isArray(notasData) ? notasData.slice(0, 5) : []);
-      setClientes(Array.isArray(clientesData) ? clientesData : []);
-    }).catch(() => {
-      setDados({});
-      setNotas([]);
-      setClientes([]);
-    }).finally(() => setLoading(false));
-  }, []);
+  Promise.all([
+    apiFetch('/nfse/dashboard'),
+    apiFetch('/nfse?limit=5'),
+    apiFetch('/clients'),
+  ]).then(([dashboard, notasData, clientesData]) => {
+    setDados(dashboard);
+    setNotas(Array.isArray(notasData) ? notasData.slice(0, 5) : []);
+    setClientes(Array.isArray(clientesData) ? clientesData : []);
+  }).catch(() => {
+    setDados({});
+    setNotas([]);
+    setClientes([]);
+  }).finally(() => setLoading(false));
+}, []);
 
   const faturamento = parseFloat(dados?.faturamento_mes || 0);
   const issEstimado = parseFloat(dados?.iss_estimado || 0);
