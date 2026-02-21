@@ -1,26 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import Link from 'next/link';
-useEffect(() => {
-  const token = typeof window !== 'undefined' ? localStorage.getItem('mynf_token') : null;
-  const headers: any = { 'Content-Type': 'application/json' };
-  if (token) headers['Authorization'] = `Bearer ${token}`;
-  const API = process.env.NEXT_PUBLIC_API_URL || 'https://mynf-production.up.railway.app/api';
 
-  Promise.all([
-    fetch(`${API}/nfse/dashboard`, { headers }).then(r => r.json()),
-    fetch(`${API}/nfse?limit=5`, { headers }).then(r => r.json()),
-    fetch(`${API}/clients`, { headers }).then(r => r.json()),
-  ]).then(([dashboard, notasData, clientesData]) => {
-    setDados(dashboard);
-    setNotas(Array.isArray(notasData) ? notasData.slice(0, 5) : []);
-    setClientes(Array.isArray(clientesData) ? clientesData : []);
-  }).catch(() => {
-    setDados({});
-    setNotas([]);
-    setClientes([]);
-  }).finally(() => setLoading(false));
 }, []);
 
 function formatBRL(v: number) {
@@ -46,6 +27,26 @@ export default function DashboardPage() {
   const [notas, setNotas] = useState<any[]>([]);
   const [clientes, setClientes] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  useEffect(() => {
+  const token = typeof window !== 'undefined' ? localStorage.getItem('mynf_token') : null;
+  const headers: any = { 'Content-Type': 'application/json' };
+  if (token) headers['Authorization'] = `Bearer ${token}`;
+  const API = process.env.NEXT_PUBLIC_API_URL || 'https://mynf-production.up.railway.app/api';
+
+  Promise.all([
+    fetch(`${API}/nfse/dashboard`, { headers }).then(r => r.json()),
+    fetch(`${API}/nfse?limit=5`, { headers }).then(r => r.json()),
+    fetch(`${API}/clients`, { headers }).then(r => r.json()),
+  ]).then(([dashboard, notasData, clientesData]) => {
+    setDados(dashboard);
+    setNotas(Array.isArray(notasData) ? notasData.slice(0, 5) : []);
+    setClientes(Array.isArray(clientesData) ? clientesData : []);
+  }).catch(() => {
+    setDados({});
+    setNotas([]);
+    setClientes([]);
+  }).finally(() => setLoading(false));
+}, []);
 
   useEffect(() => {
   Promise.all([
