@@ -4,6 +4,7 @@ import { APP_GUARD } from '@nestjs/core';
 import { HealthController } from './health.controller';
 import { CompaniesModule } from './companies/companies.module';
 import { AuthModule } from './auth/auth.module';
+import { TenantModule } from './tenant/tenant.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { AuthModule } from './auth/auth.module';
         limit: 10,
       },
     ]),
+    TenantModule,
     AuthModule,
     CompaniesModule,
   ],
