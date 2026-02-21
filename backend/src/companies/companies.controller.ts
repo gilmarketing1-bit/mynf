@@ -1,24 +1,31 @@
-import { Body, Controller, Get, Post, Req } from '@nestjs/common';
-
-interface CompanyDto {
-  cnpj: string;
-  razaoSocial: string;
-}
+import { Body, Controller, Get, Post, Put, Param, Req } from '@nestjs/common';
+import { CompaniesService } from './companies.service';
 
 @Controller('companies')
 export class CompaniesController {
-  private readonly data: Array<CompanyDto & { tenantId: string }> = [];
+  constructor(private readonly companiesService: CompaniesService) {}
 
   @Get()
-  list(@Req() req: { tenantId?: string }): CompanyDto[] {
+  list(@Req() req: any) {
     const tenantId = req.tenantId ?? 'dev-tenant';
-    return this.data.filter((item) => item.tenantId === tenantId).map(({ tenantId: _tenantId, ...company }) => company);
+    return this.companiesService.findByTenant(tenantId);
+  }
+
+  @Get(':id')
+  findOne(@Param('id') id: string, @Req() req: any) {
+    const tenantId = req.tenantId ?? 'dev-tenant';
+    return this.companiesService.findOne(id, tenantId);
   }
 
   @Post()
-  create(@Req() req: { tenantId?: string }, @Body() payload: CompanyDto): CompanyDto {
+  create(@Req() req: any, @Body() dto: any) {
     const tenantId = req.tenantId ?? 'dev-tenant';
-    this.data.push({ ...payload, tenantId });
-    return payload;
+    return this.companiesService.create(tenantId, dto);
+  }
+
+  @Put(':id')
+  update(@Param('id') id: string, @Req() req: any, @Body() dto: any) {
+    const tenantId = req.tenantId ?? 'dev-tenant';
+    return this.companiesService.update(id, tenantId, dto);
   }
 }
