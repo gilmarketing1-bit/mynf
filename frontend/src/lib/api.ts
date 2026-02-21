@@ -1,4 +1,4 @@
-const API = process.env.NEXT_PUBLIC_API_URL || 'https://mynf-production.up.railway.app/api';
+﻿const API = process.env.NEXT_PUBLIC_API_URL || 'https://mynf-production.up.railway.app/api';
 
 export function getToken(): string | null {
   if (typeof window === 'undefined') return null;
