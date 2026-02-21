@@ -5,7 +5,10 @@ import { HealthController } from './health.controller';
 import { CompaniesModule } from './companies/companies.module';
 import { AuthModule } from './auth/auth.module';
 import { TenantModule } from './tenant/tenant.module';
+import { ClientsModule } from './clients/clients.module'; // adicionar no topo
 
+// e dentro do imports[]:
+ClientsModule,
 @Module({
   imports: [
     ThrottlerModule.forRoot([
