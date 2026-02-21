@@ -176,3 +176,4 @@ export class NfseService {
     await client.end();
   }
 }
+}
