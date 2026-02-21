@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { setToken } from '@/lib/api';
+localStorage.setItem('mynf_token', data.accessToken);
 
 export default function LoginPage() {
   const router = useRouter();
