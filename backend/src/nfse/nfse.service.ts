@@ -111,28 +111,68 @@ export class NfseService {
   }
 
   async dashboard(tenantId: string) {
-    const client = this.getClient();
-    await client.connect();
-    try {
-      const result = await client.query(
-        `SELECT
-          COUNT(*) FILTER (WHERE status = 'EMITIDA') as total_emitidas,
-          COUNT(*) FILTER (WHERE status = 'REJEITADA') as total_rejeitadas,
-          COUNT(*) FILTER (WHERE status = 'CANCELADA') as total_canceladas,
-          COUNT(*) FILTER (WHERE status = 'RASCUNHO') as total_rascunhos,
-          COALESCE(SUM(valor_servico) FILTER (WHERE status = 'EMITIDA'), 0) as faturamento_mes,
-          COALESCE(SUM(valor_iss) FILTER (WHERE status = 'EMITIDA'), 0) as iss_estimado,
-          COALESCE(SUM(valor_servico) FILTER (WHERE status = 'EMITIDA' AND pago = true), 0) as total_recebido,
-          COALESCE(SUM(valor_servico) FILTER (WHERE status = 'EMITIDA' AND pago = false), 0) as total_pendente,
-          COUNT(*) FILTER (WHERE status = 'EMITIDA' AND DATE_TRUNC('day', data_emissao) = CURRENT_DATE) as emitidas_hoje
-         FROM nfse
-         WHERE tenant_id = $1
-         AND DATE_TRUNC('month', data_emissao) = DATE_TRUNC('month', CURRENT_DATE)`,
-        [tenantId]
-      );
-      return result.rows[0];
-    } finally {
-      await client.end();
-    }
+  const client = this.getClient();
+  await client.connect();
+  try {
+    const result = await client.query(
+      `SELECT
+        -- Emissões
+        COUNT(*) FILTER (WHERE status = 'EMITIDA') as total_emitidas,
+        COUNT(*) FILTER (WHERE status = 'REJEITADA') as total_rejeitadas,
+        COUNT(*) FILTER (WHERE status = 'CANCELADA') as total_canceladas,
+        COUNT(*) FILTER (WHERE status = 'RASCUNHO') as total_rascunhos,
+        COUNT(*) FILTER (WHERE status = 'EMITIDA' AND DATE_TRUNC('day', data_emissao) = CURRENT_DATE) as emitidas_hoje,
+
+        -- Faturamento
+        COALESCE(SUM(valor_servico) FILTER (WHERE status = 'EMITIDA'), 0) as faturamento_mes,
+        COALESCE(SUM(valor_iss) FILTER (WHERE status = 'EMITIDA'), 0) as iss_estimado,
+
+        -- Recebíveis — os 4 status
+        COALESCE(SUM(valor_servico) FILTER (
+          WHERE status = 'EMITIDA' AND pago = true
+        ), 0) as total_recebido,
+
+        COALESCE(SUM(valor_servico) FILTER (
+          WHERE status = 'EMITIDA' AND pago = false
+          AND data_vencimento IS NOT NULL
+          AND data_vencimento < CURRENT_DATE
+        ), 0) as total_em_atraso,
+
+        COALESCE(SUM(valor_servico) FILTER (
+          WHERE status = 'EMITIDA' AND pago = false
+          AND data_vencimento = CURRENT_DATE
+        ), 0) as total_vence_hoje,
+
+        COALESCE(SUM(valor_servico) FILTER (
+          WHERE status = 'EMITIDA' AND pago = false
+          AND data_vencimento > CURRENT_DATE
+          AND data_vencimento <= (CURRENT_DATE + INTERVAL '30 days')
+        ), 0) as total_a_vencer_30d,
+
+        COALESCE(SUM(valor_servico) FILTER (
+          WHERE status = 'EMITIDA' AND pago = false
+          AND (data_vencimento IS NULL OR data_vencimento > CURRENT_DATE + INTERVAL '30 days')
+        ), 0) as total_pendente,
+
+        -- Contagens para alertas
+        COUNT(*) FILTER (
+          WHERE status = 'EMITIDA' AND pago = false
+          AND data_vencimento IS NOT NULL
+          AND data_vencimento < CURRENT_DATE
+        ) as qtd_em_atraso,
+
+        COUNT(*) FILTER (
+          WHERE status = 'EMITIDA' AND pago = false
+          AND data_vencimento = CURRENT_DATE
+        ) as qtd_vence_hoje
+
+       FROM nfse
+       WHERE tenant_id = $1
+       AND DATE_TRUNC('month', data_emissao) = DATE_TRUNC('month', CURRENT_DATE)`,
+      [tenantId]
+    );
+    return result.rows[0];
+  } finally {
+    await client.end();
   }
 }
